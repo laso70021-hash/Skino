@@ -12,6 +12,7 @@ import { AuthModal } from './components/AuthModal';
 
 // Pages
 import { HomePage } from './pages/HomePage';
+import { DashboardPage } from './pages/DashboardPage';
 import { ScanPage } from './pages/ScanPage';
 import { ScanResultsPage } from './pages/ScanResultsPage';
 import { MySkinPage } from './pages/MySkinPage';
@@ -59,7 +60,7 @@ function MainLayout() {
           {/* 1. Home / Dashboard */}
           <Route path="/" element={<HomePage />} />
           <Route path="/home" element={<HomePage />} />
-          <Route path="/dashboard" element={<HomePage initialView="dashboard" />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* 2. AI Skin Scan */}
           <Route path="/scan" element={<ScanPage />} />
@@ -115,7 +116,7 @@ function MainLayout() {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-stone-900" />
-              <span className="font-bold text-stone-800">Skin &amp; Wellness</span>
+              <span className="font-bold text-stone-800">Skina</span>
               <span>· Understand Your Skin. Build Your Routine. Improve Your Wellness.</span>
             </div>
 

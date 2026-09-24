@@ -27,7 +27,7 @@ export const AICoachView: React.FC = () => {
     {
       id: 'welcome',
       sender: 'assistant',
-      content: `Hello ${userProfile?.displayName || 'there'}! I am your SkinAI Certified Coach. 
+      content: `Hello ${userProfile?.displayName || 'there'}! I am your Skina Certified Coach. 
 I have high-thinking ingredient reasoning enabled to check active formulation safety, layer order, wait intervals, and daily lifestyle scheduling.
 
 What would you like to check today?`

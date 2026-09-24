@@ -155,7 +155,7 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                 <Sparkles className="w-3.5 h-3.5 text-teal-300" />
               </div>
               <span className="text-lg font-serif-display font-bold tracking-tight text-stone-900">
-                Skino
+                Skina
               </span>
             </div>
 
@@ -415,11 +415,16 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className="p-4 sm:p-5 rounded-3xl bg-white border border-stone-200/80 shadow-2xs space-y-1.5"
+                    onClick={() => navigate('/skin')}
+                    className="p-4 sm:p-5 rounded-3xl bg-white border border-stone-200/80 shadow-2xs space-y-1.5 cursor-pointer hover:border-stone-400 hover:shadow-xs transition-all group"
+                    title={`View ${item.label} analysis`}
                   >
-                    <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">
-                      {item.label}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-stone-400 group-hover:text-stone-900 uppercase tracking-wider block transition-colors">
+                        {item.label}
+                      </span>
+                      <ChevronRight className="w-3 h-3 text-stone-300 group-hover:text-stone-700 transition-colors" />
+                    </div>
                     <div className="flex items-baseline justify-between">
                       <span className="text-sm font-extrabold text-stone-900">{item.state}</span>
                       <span className="text-xs font-mono text-stone-400">{item.value}</span>
@@ -745,7 +750,9 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                   return (
                     <div
                       key={product.id}
-                      className="bg-white rounded-3xl p-4 border border-stone-200/80 shadow-2xs flex flex-col justify-between group hover:shadow-md transition-all space-y-3"
+                      onClick={() => navigate(`/products/${product.id}`)}
+                      className="bg-white rounded-3xl p-4 border border-stone-200/80 shadow-2xs flex flex-col justify-between group hover:shadow-md hover:border-stone-400 transition-all space-y-3 cursor-pointer"
+                      title="View product details"
                     >
                       <div className="relative aspect-square rounded-2xl overflow-hidden bg-stone-100">
                         <img
@@ -754,8 +761,12 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         <button
-                          onClick={() => toggleFavorite(product.id)}
-                          className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition cursor-pointer ${
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(product.id);
+                          }}
+                          className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition cursor-pointer z-10 ${
                             isFav
                               ? 'bg-rose-50 text-rose-600'
                               : 'bg-white/80 hover:bg-white text-stone-600'
@@ -774,10 +785,7 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                         <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
                           {product.brand} · {product.category}
                         </span>
-                        <h4
-                          onClick={() => setSelectedProduct(product)}
-                          className="font-bold text-stone-950 text-xs hover:text-teal-700 cursor-pointer line-clamp-1"
-                        >
+                        <h4 className="font-bold text-stone-950 text-xs mt-0.5 line-clamp-1 group-hover:text-teal-700 transition">
                           {product.name}
                         </h4>
                         <div className="text-xs font-bold text-stone-900 pt-0.5">
@@ -785,12 +793,21 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => setSelectedProduct(product)}
-                        className="w-full py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition cursor-pointer"
-                      >
-                        Quick View
-                      </button>
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedProduct(product);
+                          }}
+                          className="flex-1 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition cursor-pointer"
+                        >
+                          Quick View
+                        </button>
+                        <span className="p-2 rounded-xl bg-stone-950 text-white text-xs font-bold group-hover:bg-stone-800 transition">
+                          →
+                        </span>
+                      </div>
                     </div>
                   );
                 })}
@@ -845,7 +862,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
 
               {/* Trend cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs">
+                <div
+                  onClick={() => navigate('/progress')}
+                  className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="View Hydration trend in Progress"
+                >
                   <span className="text-stone-400 text-[10px] uppercase font-bold tracking-wider block">Hydration</span>
                   <div className="flex items-center gap-1.5 mt-1 font-bold text-stone-900 text-sm">
                     <span className="text-emerald-600">↑</span>
@@ -853,7 +874,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs">
+                <div
+                  onClick={() => navigate('/progress')}
+                  className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="View Texture trend in Progress"
+                >
                   <span className="text-stone-400 text-[10px] uppercase font-bold tracking-wider block">Texture</span>
                   <div className="flex items-center gap-1.5 mt-1 font-bold text-stone-900 text-sm">
                     <span className="text-teal-600">→</span>
@@ -861,7 +886,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs">
+                <div
+                  onClick={() => navigate('/progress')}
+                  className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="View Oil Balance trend in Progress"
+                >
                   <span className="text-stone-400 text-[10px] uppercase font-bold tracking-wider block">Oil Balance</span>
                   <div className="flex items-center gap-1.5 mt-1 font-bold text-stone-900 text-sm">
                     <span className="text-emerald-600">↑</span>
@@ -869,7 +898,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs">
+                <div
+                  onClick={() => navigate('/progress')}
+                  className="p-3.5 rounded-2xl bg-[#faf8f5] border border-stone-200/70 text-xs cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="View Routine Adherence in Progress"
+                >
                   <span className="text-stone-400 text-[10px] uppercase font-bold tracking-wider block">Routine Adherence</span>
                   <div className="flex items-center gap-1.5 mt-1 font-bold text-stone-900 text-sm">
                     <span className="text-teal-700">82%</span>
@@ -899,7 +932,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2">
+                <div
+                  onClick={() => navigate('/wellness')}
+                  className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2 cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="Open Hydration tracking"
+                >
                   <div className="flex items-center justify-between">
                     <strong className="text-xs font-bold text-stone-900">Hydration</strong>
                     <Droplets className="w-3.5 h-3.5 text-teal-600" />
@@ -911,7 +948,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                   <p className="text-[11px] text-stone-500">Keep daily hydration checkpoints consistent.</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2">
+                <div
+                  onClick={() => navigate('/wellness')}
+                  className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2 cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="Open Sleep schedule"
+                >
                   <div className="flex items-center justify-between">
                     <strong className="text-xs font-bold text-stone-900">Sleep</strong>
                     <Moon className="w-3.5 h-3.5 text-indigo-600" />
@@ -920,7 +961,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                   <p className="text-[11px] text-stone-500">Nocturnal cellular repair occurs primarily during deep sleep stages.</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2">
+                <div
+                  onClick={() => navigate('/wellness')}
+                  className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2 cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="Open Sun Protection guidelines"
+                >
                   <div className="flex items-center justify-between">
                     <strong className="text-xs font-bold text-stone-900">Sun Protection</strong>
                     <Sun className="w-3.5 h-3.5 text-amber-600" />
@@ -929,7 +974,11 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
                   <p className="text-[11px] text-stone-500">Broad-spectrum shield against collagen degradation.</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2">
+                <div
+                  onClick={() => navigate('/wellness')}
+                  className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-200/70 space-y-2 cursor-pointer hover:border-stone-400 hover:shadow-2xs transition"
+                  title="Open Lifestyle & Nutrition plan"
+                >
                   <div className="flex items-center justify-between">
                     <strong className="text-xs font-bold text-stone-900">Lifestyle</strong>
                     <Activity className="w-3.5 h-3.5 text-teal-600" />
@@ -945,7 +994,7 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
               <div className="space-y-1.5 relative z-10 max-w-xl">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-teal-300 text-xs font-bold">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>✦ Ask Skino AI</span>
+                  <span>✦ Ask Skina AI</span>
                 </div>
                 <h3 className="text-2xl font-serif-display font-normal">
                   What would you like help with today?
@@ -1056,7 +1105,7 @@ export const UserDashboardView: React.FC<UserDashboardViewProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-stone-100">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-teal-600" />
-                <h4 className="font-bold text-stone-950 text-sm">Why Skino Recommends This</h4>
+                <h4 className="font-bold text-stone-950 text-sm">Why Skina Recommends This</h4>
               </div>
               <button
                 onClick={() => setSeeWhyProduct(null)}

@@ -17,7 +17,7 @@
         "lifestyle": { "type": "string", "description": "Sleep, exercise, sun exposure, and stress levels" },
         "dietPreferences": { "type": "string", "description": "Dietary habits and preferences" },
         "dailySchedule": { "type": "string", "description": "User daily routine times (wake, work, gym, sleep)" },
-        "subscriptionTier": { "type": "string", "enum": ["free", "start", "high"], "description": "Active subscription tier" },
+        "subscriptionTier": { "type": "string", "enum": ["free", "bronze", "silver", "gold", "platinum", "enterprise", "start", "high"], "description": "Active subscription tier" },
         "allowPhotoStorage": { "type": "boolean", "description": "Whether user allows saving facial photos" },
         "notificationSettings": { "type": "object", "description": "Push and email notification preferences" },
         "createdAt": { "type": "string", "description": "Creation timestamp" }

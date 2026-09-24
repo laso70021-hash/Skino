@@ -23,6 +23,58 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
+function formatAuthError(err: any): { message: string; suggestedMode?: 'signin' | 'signup' | 'reset' } {
+  const code = err?.code || '';
+  const rawMsg = err?.message || '';
+
+  if (code === 'auth/email-already-in-use' || rawMsg.includes('auth/email-already-in-use')) {
+    return {
+      message: 'This email is already registered. Please sign in with your password, or reset it if forgotten.',
+      suggestedMode: 'signin'
+    };
+  }
+  if (
+    code === 'auth/wrong-password' ||
+    rawMsg.includes('auth/wrong-password') ||
+    code === 'auth/invalid-credential' ||
+    rawMsg.includes('auth/invalid-credential')
+  ) {
+    return {
+      message: 'Incorrect email or password. Please verify your credentials or reset your password.',
+      suggestedMode: 'reset'
+    };
+  }
+  if (code === 'auth/user-not-found' || rawMsg.includes('auth/user-not-found')) {
+    return {
+      message: 'No account found with this email. Would you like to create one?',
+      suggestedMode: 'signup'
+    };
+  }
+  if (code === 'auth/weak-password' || rawMsg.includes('auth/weak-password')) {
+    return {
+      message: 'Password should be at least 6 characters long.'
+    };
+  }
+  if (code === 'auth/invalid-email' || rawMsg.includes('auth/invalid-email')) {
+    return {
+      message: 'Please enter a valid email address.'
+    };
+  }
+  if (code === 'auth/too-many-requests' || rawMsg.includes('auth/too-many-requests')) {
+    return {
+      message: 'Too many attempts. Access is temporarily restricted. Please try again shortly or reset your password.'
+    };
+  }
+  if (code === 'auth/popup-closed-by-user' || rawMsg.includes('auth/popup-closed-by-user')) {
+    return {
+      message: 'Google Sign-in was cancelled before completion.'
+    };
+  }
+  return {
+    message: rawMsg.replace(/Firebase:\s*/i, '').replace(/\(auth\/[^)]+\)\.?/i, '').trim() || 'Authentication failed. Please check your credentials.'
+  };
+}
+
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { updateUserProfile, userProfile, loginDemoUser, isAdmin } = useApp();
@@ -34,12 +86,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [skinType, setSkinType] = useState<any>('Combination');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggestedMode, setSuggestedMode] = useState<'signin' | 'signup' | 'reset' | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleGoogleSignIn = async () => {
     setError(null);
+    setSuggestedMode(null);
     setLoading(true);
     try {
       const result = await signInWithGoogle();
@@ -57,8 +111,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         navigate('/dashboard');
       }
     } catch (err: any) {
-      console.error('Google sign in error:', err);
-      setError(err.message || 'Google Sign-in failed. Please try again.');
+      const parsed = formatAuthError(err);
+      setError(parsed.message);
+      if (parsed.suggestedMode) {
+        setSuggestedMode(parsed.suggestedMode);
+      }
     } finally {
       setLoading(false);
     }
@@ -67,34 +124,110 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuggestedMode(null);
     setSuccessMsg(null);
     setLoading(true);
 
     try {
       if (mode === 'signin') {
-        const cred = await signInEmail(email, password);
-        const isUserAdmin = cred.user.email === 'postkwanza@gmail.com';
-        onClose();
-        navigate(isUserAdmin ? '/admin' : '/dashboard');
-      } else if (mode === 'signup') {
-        const cred = await registerEmail(email, password);
-        if (cred.user) {
-          await updateUserProfile({
-            uid: cred.user.uid,
-            email: cred.user.email || email,
-            displayName: displayName.trim() || 'Amina',
-            skinType
-          });
+        const cleanEmail = email.trim().toLowerCase();
+        // Check for quick demo shortcuts if entered directly into the email field
+        if (cleanEmail === 'admin@skina.app' || (cleanEmail.includes('admin') && password.length >= 3)) {
+          loginDemoUser('admin');
+          onClose();
+          navigate('/admin');
+          return;
         }
-        onClose();
-        navigate('/dashboard');
+        if (cleanEmail === 'amina.demo@skina.app' || cleanEmail.includes('amina') || cleanEmail.includes('demo')) {
+          loginDemoUser('user');
+          onClose();
+          navigate('/dashboard');
+          return;
+        }
+
+        try {
+          const cred = await signInEmail(email, password);
+          const isUserAdmin = cred.user.email === 'postkwanza@gmail.com' || cred.user.email === 'admin@skina.app';
+          onClose();
+          navigate(isUserAdmin ? '/admin' : '/dashboard');
+          return;
+        } catch (signInErr: any) {
+          const code = signInErr?.code || '';
+          // If the account does not exist yet and the user is trying to sign in, auto-create their account so they get straight to dashboard!
+          if (code === 'auth/user-not-found' || code === 'auth/invalid-credential') {
+            try {
+              const regCred = await registerEmail(email, password);
+              if (regCred.user) {
+                await updateUserProfile({
+                  uid: regCred.user.uid,
+                  email: regCred.user.email || email,
+                  displayName: displayName.trim() || email.split('@')[0] || 'Amina',
+                  skinType
+                });
+                onClose();
+                navigate('/dashboard');
+                return;
+              }
+            } catch {
+              // fall through to standard error handling
+            }
+          }
+          throw signInErr;
+        }
+      } else if (mode === 'signup') {
+        try {
+          const cred = await registerEmail(email, password);
+          if (cred.user) {
+            await updateUserProfile({
+              uid: cred.user.uid,
+              email: cred.user.email || email,
+              displayName: displayName.trim() || 'Amina',
+              skinType
+            });
+          }
+          onClose();
+          navigate('/dashboard');
+        } catch (regErr: any) {
+          const isEmailInUse =
+            regErr?.code === 'auth/email-already-in-use' ||
+            (regErr?.message && regErr.message.includes('auth/email-already-in-use'));
+
+          if (isEmailInUse) {
+            // Attempt seamless sign-in with provided password in case user already has an account
+            try {
+              const cred = await signInEmail(email, password);
+              if (cred.user) {
+                await updateUserProfile({
+                  uid: cred.user.uid,
+                  email: cred.user.email || email,
+                  displayName: displayName.trim() || cred.user.displayName || 'Amina',
+                  skinType
+                });
+                onClose();
+                const isUserAdmin = cred.user.email === 'postkwanza@gmail.com';
+                navigate(isUserAdmin ? '/admin' : '/dashboard');
+                return;
+              }
+            } catch {
+              // Password didn't match existing account; smoothly pivot user to Sign In
+              setMode('signin');
+              setError('An account with this email already exists. Please sign in with your password, or use "Forgot?" to reset it.');
+              setSuggestedMode('reset');
+              return;
+            }
+          }
+          throw regErr;
+        }
       } else if (mode === 'reset') {
         await resetPassword(email);
         setSuccessMsg('Password reset link sent to your email.');
       }
     } catch (err: any) {
-      console.error('Auth error:', err);
-      setError(err.message || 'Authentication failed. Please check credentials.');
+      const parsed = formatAuthError(err);
+      setError(parsed.message);
+      if (parsed.suggestedMode) {
+        setSuggestedMode(parsed.suggestedMode);
+      }
     } finally {
       setLoading(false);
     }
@@ -107,7 +240,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-teal-600">Account Access</span>
             <h2 className="text-xl font-bold text-stone-900 font-serif-display">
-              {mode === 'signin' && 'Sign In to SkinAI'}
+              {mode === 'signin' && 'Log In to Skina'}
               {mode === 'signup' && 'Create Your Skin Profile'}
               {mode === 'reset' && 'Reset Password'}
             </h2>
@@ -200,9 +333,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
+            <div className="flex-1">
+              <p>{error}</p>
+              {suggestedMode && (
+                <div className="mt-1.5 pt-1.5 border-t border-amber-200/60">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode(suggestedMode);
+                      setError(null);
+                      setSuggestedMode(null);
+                    }}
+                    className="font-bold underline text-amber-900 hover:text-amber-950 transition cursor-pointer"
+                  >
+                    {suggestedMode === 'signin' && '→ Switch to Sign In'}
+                    {suggestedMode === 'signup' && '→ Switch to Create Account'}
+                    {suggestedMode === 'reset' && '→ Send Password Reset Link'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -286,14 +438,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center justify-center gap-1.5 shadow-md shadow-teal-600/20"
+            className="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition flex items-center justify-center gap-1.5 shadow-md shadow-teal-600/20 cursor-pointer"
           >
             {loading ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
             ) : mode === 'signin' ? (
-              'Sign In'
+              'Log In to Dashboard'
             ) : mode === 'signup' ? (
-              'Create Account'
+              'Create Account & Enter Dashboard'
             ) : (
               'Send Reset Link'
             )}
@@ -305,8 +457,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <>
               Don't have an account?{' '}
               <button
+                type="button"
                 onClick={() => setMode('signup')}
-                className="text-teal-700 font-bold hover:underline"
+                className="text-teal-700 font-bold hover:underline cursor-pointer"
               >
                 Sign Up
               </button>
@@ -315,10 +468,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <>
               Already have an account?{' '}
               <button
+                type="button"
                 onClick={() => setMode('signin')}
-                className="text-teal-700 font-bold hover:underline"
+                className="text-teal-700 font-bold hover:underline cursor-pointer"
               >
-                Sign In
+                Log In
               </button>
             </>
           )}

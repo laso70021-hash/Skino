@@ -49,24 +49,24 @@ export const CalendarView: React.FC = () => {
     const startStr = `${evt.date.replace(/-/g, '')}T${evt.time.replace(':', '')}00`;
     const endHour = (parseInt(evt.time.split(':')[0]) + 1).toString().padStart(2, '0');
     const endStr = `${evt.date.replace(/-/g, '')}T${endHour}${evt.time.split(':')[1]}00`;
-    const details = encodeURIComponent(evt.notes || 'SkinAI Skincare & Wellness checkpoint');
-    const title = encodeURIComponent(`SkinAI: ${evt.title}`);
+    const details = encodeURIComponent(evt.notes || 'Skina Skincare & Wellness checkpoint');
+    const title = encodeURIComponent(`Skina: ${evt.title}`);
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}`;
   };
 
   // Generate .ics download
   const downloadICS = () => {
-    let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SkinAI//Skincare OS//EN\n";
+    let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Skina//Skincare OS//EN\n";
     calendarEvents.forEach((evt) => {
       const dtStart = `${evt.date.replace(/-/g, '')}T${evt.time.replace(':', '')}00`;
-      icsContent += `BEGIN:VEVENT\nSUMMARY:SkinAI: ${evt.title}\nDTSTART:${dtStart}\nDESCRIPTION:${evt.notes || ''}\nSTATUS:${evt.completed ? 'COMPLETED' : 'CONFIRMED'}\nEND:VEVENT\n`;
+      icsContent += `BEGIN:VEVENT\nSUMMARY:Skina: ${evt.title}\nDTSTART:${dtStart}\nDESCRIPTION:${evt.notes || ''}\nSTATUS:${evt.completed ? 'COMPLETED' : 'CONFIRMED'}\nEND:VEVENT\n`;
     });
     icsContent += "END:VCALENDAR";
 
     const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.setAttribute('download', 'skinai-schedule.ics');
+    link.setAttribute('download', 'skina-schedule.ics');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

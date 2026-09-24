@@ -29,12 +29,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Navigation items matching the reference design (Public website navigation)
+  // Navigation items matching the reference design (Public website navigation + Dashboard when signed in)
   const navItems = [
     { label: 'Home', sectionId: 'hero', route: '/home' },
+    ...(user ? [{ label: 'Dashboard', sectionId: 'dashboard', route: '/dashboard' }] : []),
     { label: 'How It Works', sectionId: 'how-it-works', route: '/home#how-it-works' },
     { label: 'AI Analysis', sectionId: 'ai-analysis', route: '/scan' },
     { label: 'Routine', sectionId: 'routine', route: '/routine' },
+    { label: 'Products', sectionId: 'products', route: '/products' },
     { label: 'Wellness', sectionId: 'wellness', route: '/wellness' },
     { label: 'Pricing', sectionId: 'pricing', route: '/profile/subscription' },
   ];
@@ -62,10 +64,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
   };
 
   return (
-    <header className="hidden md:block sticky top-0 z-40 bg-[#faf8f5]/90 backdrop-blur-md border-b border-stone-200/70">
+    <header className="sticky top-0 z-40 bg-[#faf8f5]/90 backdrop-blur-md border-b border-stone-200/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & Brand (Skin & Wellness with diamond icon) */}
+          {/* Logo & Brand: Skina */}
           <div
             className="flex items-center gap-2.5 cursor-pointer select-none shrink-0"
             onClick={() => {
@@ -74,11 +76,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
             }}
           >
             <div className="w-8 h-8 rounded-full bg-stone-950 text-white flex items-center justify-center shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-stone-200" />
+              <Sparkles className="w-3.5 h-3.5 text-teal-300" />
             </div>
             <div>
               <span className="text-base font-bold tracking-tight text-stone-900 flex items-center gap-1.5 font-serif-display">
-                Skin &amp; Wellness
+                Skina
               </span>
             </div>
           </div>
@@ -127,14 +129,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
-                  className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-stone-50 hover:bg-stone-100 border border-stone-200 transition cursor-pointer"
+                  className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full bg-teal-50 hover:bg-teal-100/90 border border-teal-200 text-teal-900 transition cursor-pointer shadow-2xs group"
                   title="Go to Dashboard"
                 >
-                  <div className="w-6 h-6 rounded-full bg-stone-900 text-white text-[10px] font-bold flex items-center justify-center">
-                    {(userProfile?.displayName || user.email || 'A').charAt(0).toUpperCase()}
+                  <div className="w-6 h-6 rounded-full bg-teal-700 text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                    {(userProfile?.displayName || user.displayName || user.email || 'A').charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-xs font-bold text-stone-800 hidden md:block max-w-[90px] truncate">
-                    {userProfile?.displayName || user.email?.split('@')[0]}
+                  <span className="text-xs font-bold flex items-center gap-1">
+                    <span>Dashboard</span>
+                    <ArrowRight className="w-3 h-3 text-teal-600 transition group-hover:translate-x-0.5" />
                   </span>
                 </button>
                 {isAdmin && (
@@ -150,9 +153,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
             ) : (
               <button
                 onClick={onOpenAuth}
-                className="px-3.5 py-1.5 rounded-full text-xs font-bold text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition cursor-pointer"
+                className="px-3.5 py-1.5 rounded-full text-xs font-bold text-stone-700 hover:text-stone-950 hover:bg-stone-100 border border-stone-200/80 transition cursor-pointer shadow-2xs"
               >
-                Sign In
+                Log In
               </button>
             )}
 
@@ -188,7 +191,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                   <div className="w-8 h-8 rounded-full bg-stone-950 text-white flex items-center justify-center">
                     <Sparkles className="w-4 h-4 text-teal-300" />
                   </div>
-                  <span className="font-bold text-stone-900 font-serif-display text-base">SkinAI</span>
+                  <span className="font-bold text-stone-900 font-serif-display text-base">Skina</span>
                 </div>
                 <CloseButton onClick={() => setMobileMenuOpen(false)} ariaLabel="Close navigation menu" />
               </div>
@@ -250,7 +253,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
                   }}
                   className="w-full py-2 rounded-full border border-stone-300 text-stone-800 text-xs font-bold hover:bg-stone-50 transition"
                 >
-                  Sign In / Create Account
+                  Log In / Create Account
                 </button>
               )}
             </div>

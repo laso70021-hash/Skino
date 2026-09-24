@@ -59,8 +59,10 @@ export const signInWithGoogle = async (): Promise<{ user: User; accessToken: str
     const credential = GoogleAuthProvider.credentialFromResult(result);
     cachedAccessToken = credential?.accessToken || null;
     return { user: result.user, accessToken: cachedAccessToken };
-  } catch (error) {
-    console.error('Google Sign in error:', error);
+  } catch (error: any) {
+    if (error?.code !== 'auth/popup-closed-by-user' && error?.code !== 'auth/cancelled-popup-request') {
+      console.warn('Google Sign in notice:', error?.message || error);
+    }
     throw error;
   } finally {
     isSigningIn = false;

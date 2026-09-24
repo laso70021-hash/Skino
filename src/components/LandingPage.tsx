@@ -296,7 +296,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 Strict Ingredient Compatibility.
               </h2>
               <p className="text-sm text-stone-600 leading-relaxed">
-                Unlike generic chatbots that recommend random products from the internet, SkinAI queries an approved catalog curated by administrators. Every product contains structured active ingredients, wait interval requirements, and contraindication flags.
+                Unlike generic chatbots that recommend random products from the internet, Skina queries an approved catalog curated by administrators. Every product contains structured active ingredients, wait interval requirements, and contraindication flags.
               </p>
               <div className="space-y-3 text-xs">
                 <div className="flex items-start gap-2.5">

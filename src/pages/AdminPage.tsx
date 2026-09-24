@@ -290,7 +290,7 @@ export const AdminPage: React.FC = () => {
               Administrator Access Required
             </h2>
             <p className="text-xs text-stone-500 leading-relaxed">
-              The Skino Command Center is restricted to authorized administrative personnel.
+              The Skina Command Center is restricted to authorized administrative personnel.
             </p>
           </div>
 
@@ -333,7 +333,7 @@ export const AdminPage: React.FC = () => {
               </div>
               <div>
                 <span className="font-bold text-stone-950 text-sm tracking-tight block">
-                  Skino Command
+                  Skina Command
                 </span>
                 <span className="text-[10px] text-stone-400 font-mono">v2.4.0 · Production</span>
               </div>

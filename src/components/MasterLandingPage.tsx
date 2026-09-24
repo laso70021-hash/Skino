@@ -27,6 +27,9 @@ import { useApp } from '../context/AppContext';
 export const MasterLandingPage: React.FC = () => {
   const navigate = useNavigate();
   const {
+    user,
+    userProfile,
+    isAdmin,
     formatPrice,
     currency,
     setCurrency,
@@ -241,16 +244,24 @@ export const MasterLandingPage: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
             <button
-              onClick={() => navigate('/scan')}
+              onClick={() => navigate(user ? (isAdmin ? '/admin' : '/dashboard') : '/dashboard')}
               className="w-full sm:w-auto min-w-[220px] h-14 px-10 rounded-full bg-stone-950 hover:bg-stone-900 text-white font-medium text-sm tracking-wide shadow-2xl border border-white/20 transition flex items-center justify-center gap-2 cursor-pointer active:scale-98"
             >
-              <span>Get Started</span>
+              <span>{user ? 'Enter Dashboard' : 'Get Started'}</span>
               <ArrowRight className="w-4 h-4 text-stone-300" />
             </button>
 
             <button
+              onClick={() => navigate('/scan')}
+              className="w-full sm:w-auto min-w-[180px] h-14 px-8 rounded-full bg-white/90 hover:bg-white text-stone-900 font-medium text-sm backdrop-blur-md transition flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+            >
+              <span>Start AI Scan</span>
+              <Camera className="w-4 h-4 text-stone-600" />
+            </button>
+
+            <button
               onClick={() => scrollToSection('how-it-works')}
-              className="hidden sm:flex h-14 px-8 rounded-full bg-white/90 hover:bg-white text-stone-900 font-medium text-sm backdrop-blur-md transition items-center justify-center cursor-pointer shadow-lg"
+              className="hidden lg:flex h-14 px-6 rounded-full bg-stone-900/50 hover:bg-stone-900/80 text-white font-medium text-sm border border-white/20 backdrop-blur-md transition items-center justify-center cursor-pointer shadow-lg"
             >
               How It Works
             </button>
@@ -1270,7 +1281,7 @@ export const MasterLandingPage: React.FC = () => {
         </div>
 
         <div className="pt-8 border-t border-stone-200/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
-          <p>© {new Date().getFullYear()} Skin &amp; Wellness. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Skina. All rights reserved.</p>
           <p className="text-stone-400 hidden lg:block">Cosmetic &amp; wellness guidance — not medical diagnosis.</p>
         </div>
       </footer>

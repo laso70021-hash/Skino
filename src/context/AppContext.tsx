@@ -25,13 +25,17 @@ import {
   UserRoutine,
   WellnessPlan,
   CalendarEvent,
-  UserProfile
+  UserProfile,
+  SubscriptionTier,
+  PlanEntitlements
 } from '../types';
 import { INITIAL_PRODUCTS } from '../data/initialProducts';
+import { getEntitlementsForTier } from '../data/subscriptionPlans';
 
 interface AppContextType {
   user: User | null;
   userProfile: UserProfile | null;
+  entitlements: PlanEntitlements;
   catalogProducts: CatalogProduct[];
   userProducts: UserProduct[];
   analyses: SkinAnalysis[];
@@ -71,7 +75,7 @@ interface AppContextType {
   deleteCatalogProduct: (productId: string) => Promise<void>;
   addCalendarEvent: (event: Omit<CalendarEvent, 'id' | 'userId'>) => Promise<void>;
   toggleCalendarEvent: (eventId: string) => Promise<void>;
-  setSubscriptionTier: (tier: 'free' | 'start' | 'high') => Promise<void>;
+  setSubscriptionTier: (tier: SubscriptionTier) => Promise<void>;
   logout: () => Promise<void>;
   loginDemoUser: (role: 'user' | 'admin') => void;
   formatPrice: (priceTZS: number, priceUSD: number) => string;
@@ -96,7 +100,7 @@ const defaultProfile: UserProfile = {
     exerciseTime: '18:00',
     sleepTime: '22:30'
   },
-  subscriptionTier: 'start',
+  subscriptionTier: 'silver',
   allowPhotoStorage: true,
   notificationSettings: {
     morningSkincare: true,
@@ -123,6 +127,55 @@ const initialSampleAnalysis: SkinAnalysis = {
     texture: 76,
     pigmentation: 59,
     redness: 82
+  },
+  radarMetrics: {
+    hydration: 71,
+    sebum: 68,
+    pores: 74,
+    spots: 62,
+    wrinkles: 86,
+    texture: 76
+  },
+  facialZones: {
+    forehead: {
+      observation: 'Noticeable surface sheen with mild pore dilation across upper bridge.',
+      metric: 68,
+      severity: 'Moderate',
+      recommendation: 'Use Niacinamide 10% to control daytime lipid excretion.'
+    },
+    leftCheek: {
+      observation: 'Mild erythema and resolving flat post-inflammatory markings.',
+      metric: 74,
+      severity: 'Mild',
+      recommendation: 'Azelaic acid suspension 10% nightly.'
+    },
+    rightCheek: {
+      observation: 'Firm barrier bounce with balanced cellular hydration.',
+      metric: 78,
+      severity: 'Normal',
+      recommendation: 'Maintain broad-spectrum SPF 50+ protection.'
+    },
+    nose: {
+      observation: 'Sebaceous filaments around alar groove with slight micro-texture.',
+      metric: 66,
+      severity: 'Moderate',
+      recommendation: 'Gentle circular double cleansing for 60 seconds.'
+    },
+    chin: {
+      observation: 'Scattered closed comedones and minor active papules.',
+      metric: 70,
+      severity: 'Mild',
+      recommendation: 'Salicylic acid spot application on alternate evenings.'
+    }
+  },
+  facialHeatmap: {
+    oil: { intensity: 68, areaRatio: 24 },
+    pores: { intensity: 62, areaRatio: 18 },
+    redness: { intensity: 36, areaRatio: 12 },
+    spots: { intensity: 32, areaRatio: 9 },
+    texture: { intensity: 40, areaRatio: 15 },
+    wrinkles: { intensity: 22, areaRatio: 6 },
+    hydration: { intensity: 78, areaRatio: 62 }
   },
   findings: [
     {
@@ -157,6 +210,8 @@ const initialSampleAnalysis: SkinAnalysis = {
   estimatedAppearanceAge: 23,
   appearanceAgeDisclaimer: 'This is an AI-generated visual estimate and is not a medical or biological measurement.',
   dermatologyDisclaimer: 'This platform provides cosmetic guidance, not a medical diagnosis. Consider consulting a qualified dermatologist if symptoms are severe, persistent, painful, infected, or worsening.',
+  modelVersion: 'gemini-3.8-flash',
+  analysisVersion: 'v2.5-tiered',
   createdAt: new Date(Date.now() - 3 * 86400000).toISOString()
 };
 
@@ -885,7 +940,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const setSubscriptionTier = async (tier: 'free' | 'start' | 'high') => {
+  const setSubscriptionTier = async (tier: SubscriptionTier) => {
     await updateUserProfile({ subscriptionTier: tier });
   };
 
@@ -900,7 +955,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (role === 'admin') {
       const adminUser = {
         uid: 'demo_admin_01',
-        email: 'admin@skinai.app',
+        email: 'admin@skina.app',
         displayName: 'Dr. Grace (Admin)',
         photoURL: 'https://images.unsplash.com/photo-1594824813637-4b104618e001?w=150&auto=format&fit=crop&q=80'
       } as unknown as User;
@@ -909,16 +964,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const newProfile: UserProfile = {
         ...defaultProfile,
         uid: 'demo_admin_01',
-        email: 'admin@skinai.app',
+        email: 'admin@skina.app',
         displayName: 'Dr. Grace (Admin)',
-        subscriptionTier: 'high'
+        subscriptionTier: 'platinum'
       };
       setUserProfile(newProfile);
       localStorage.setItem('skinai_user_profile', JSON.stringify(newProfile));
     } else {
       const standardUser = {
         uid: 'demo_user_amina',
-        email: 'amina.demo@skinai.app',
+        email: 'amina.demo@skina.app',
         displayName: 'Amina',
         photoURL: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80'
       } as unknown as User;
@@ -927,9 +982,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const newProfile: UserProfile = {
         ...defaultProfile,
         uid: 'demo_user_amina',
-        email: 'amina.demo@skinai.app',
+        email: 'amina.demo@skina.app',
         displayName: 'Amina',
-        subscriptionTier: 'start'
+        subscriptionTier: 'gold'
       };
       setUserProfile(newProfile);
       localStorage.setItem('skinai_user_profile', JSON.stringify(newProfile));
@@ -964,12 +1019,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const latestAnalysis = analyses.length > 0 ? analyses[0] : null;
+  const entitlements = getEntitlementsForTier(userProfile?.subscriptionTier || 'silver');
 
   return (
     <AppContext.Provider
       value={{
         user,
         userProfile,
+        entitlements,
         catalogProducts,
         userProducts,
         analyses,

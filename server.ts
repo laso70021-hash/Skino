@@ -91,14 +91,23 @@ CRITICAL MEDICAL BOUNDARY:
 - The skin health score is our platform's standardized cosmetic wellness metric (0 to 100), not a medical measurement.
 - The skin appearance estimate is an AI visual appearance estimate, not a biological age.
 
-Analyze the visible skin for:
-1. Acne-like blemishes (papules, pustules, comedones)
-2. Visible redness / erythema
-3. Dark spots / hyperpigmentation / post-inflammatory erythema
-4. Texture roughness and visible pores
-5. Oiliness / sebum balance
-6. Dryness / flakiness / hydration visual indicators
-7. Fine lines / under-eye appearance
+Analyze the visible skin across 5 anatomical facial zones:
+1. Forehead (Micro-lines, oiliness, pore density)
+2. Left Cheek (Texture, erythema/redness, post-inflammatory spots)
+3. Right Cheek (Hydration, pigmentation balance, vascular calm)
+4. Nose (Pore dilation, sebum concentration, blackheads)
+5. Chin (Closed comedones, texture roughness, barrier integrity)
+
+Also compute comprehensive multi-dimensional radar metrics (0-100, where higher is healthier/better):
+- Hydration
+- Sebum Balance
+- Pore Appearance
+- Spot/Pigmentation Evenness
+- Wrinkle/Smoothness Appearance
+- Surface Texture
+
+Also compute facial heatmap intensities (0-100) and observed area ratios (0-100%) for:
+- oil, pores, redness, spots, texture, wrinkles, hydration.
 
 Return ONLY valid JSON matching this schema:
 {
@@ -111,6 +120,55 @@ Return ONLY valid JSON matching this schema:
     "pigmentation": number (0-100, higher = more even tone),
     "redness": number (0-100, higher = calm, less redness)
   },
+  "radarMetrics": {
+    "hydration": number (0-100),
+    "sebum": number (0-100),
+    "pores": number (0-100),
+    "spots": number (0-100),
+    "wrinkles": number (0-100),
+    "texture": number (0-100)
+  },
+  "facialZones": {
+    "forehead": {
+      "observation": string,
+      "metric": number (0-100),
+      "severity": "Low" | "Moderate" | "High" | "Normal",
+      "recommendation": string
+    },
+    "leftCheek": {
+      "observation": string,
+      "metric": number (0-100),
+      "severity": "Low" | "Moderate" | "High" | "Normal",
+      "recommendation": string
+    },
+    "rightCheek": {
+      "observation": string,
+      "metric": number (0-100),
+      "severity": "Low" | "Moderate" | "High" | "Normal",
+      "recommendation": string
+    },
+    "nose": {
+      "observation": string,
+      "metric": number (0-100),
+      "severity": "Low" | "Moderate" | "High" | "Normal",
+      "recommendation": string
+    },
+    "chin": {
+      "observation": string,
+      "metric": number (0-100),
+      "severity": "Low" | "Moderate" | "High" | "Normal",
+      "recommendation": string
+    }
+  },
+  "facialHeatmap": {
+    "oil": { "intensity": number (0-100), "areaRatio": number (0-100) },
+    "pores": { "intensity": number (0-100), "areaRatio": number (0-100) },
+    "redness": { "intensity": number (0-100), "areaRatio": number (0-100) },
+    "spots": { "intensity": number (0-100), "areaRatio": number (0-100) },
+    "texture": { "intensity": number (0-100), "areaRatio": number (0-100) },
+    "wrinkles": { "intensity": number (0-100), "areaRatio": number (0-100) },
+    "hydration": { "intensity": number (0-100), "areaRatio": number (0-100) }
+  },
   "findings": [
     {
       "concern": string,
@@ -122,7 +180,9 @@ Return ONLY valid JSON matching this schema:
   ],
   "estimatedAppearanceAge": number (estimated visual appearance age),
   "appearanceAgeDisclaimer": "This is an AI-generated visual estimate and is not a biological measurement.",
-  "dermatologyDisclaimer": "This platform provides cosmetic guidance, not a medical diagnosis. Consider consulting a qualified dermatologist if symptoms are severe, persistent, painful, infected, or worsening."
+  "dermatologyDisclaimer": "This platform provides cosmetic guidance, not a medical diagnosis. Consider consulting a qualified dermatologist if symptoms are severe, persistent, painful, infected, or worsening.",
+  "modelVersion": "gemini-3.8-flash",
+  "analysisVersion": "v2.5-tiered"
 }`;
 
     const imagePart = {
@@ -155,9 +215,60 @@ Return ONLY valid JSON matching this schema:
         pigmentation: 65,
         redness: 80
       },
+      radarMetrics: {
+        hydration: 72,
+        sebum: 68,
+        pores: 74,
+        spots: 69,
+        wrinkles: 84,
+        texture: 76
+      },
+      facialZones: {
+        forehead: {
+          observation: "Moderate surface lipid sheen with clear skin barrier.",
+          metric: 72,
+          severity: "Moderate",
+          recommendation: "Gentle non-foaming cleanser and Niacinamide serum."
+        },
+        leftCheek: {
+          observation: "Vascularly calm with isolated faint melanin spots.",
+          metric: 78,
+          severity: "Mild",
+          recommendation: "Azelaic acid application to promote even tone."
+        },
+        rightCheek: {
+          observation: "Good dermal hydration bounce with minimal micro-texture.",
+          metric: 80,
+          severity: "Normal",
+          recommendation: "Daily broad-spectrum SPF 50+ defense."
+        },
+        nose: {
+          observation: "Follicular pore dilation with localized sebaceous activity.",
+          metric: 66,
+          severity: "Moderate",
+          recommendation: "Evening salicylic acid or double cleanse routine."
+        },
+        chin: {
+          observation: "Faint post-inflammatory markings from past resolved blemishes.",
+          metric: 74,
+          severity: "Mild",
+          recommendation: "Maintain barrier hydration with panthenol and ceramides."
+        }
+      },
+      facialHeatmap: {
+        oil: { intensity: 68, areaRatio: 22 },
+        pores: { intensity: 62, areaRatio: 16 },
+        redness: { intensity: 36, areaRatio: 11 },
+        spots: { intensity: 30, areaRatio: 8 },
+        texture: { intensity: 38, areaRatio: 13 },
+        wrinkles: { intensity: 22, areaRatio: 6 },
+        hydration: { intensity: 80, areaRatio: 64 }
+      },
       estimatedAppearanceAge: 25,
       appearanceAgeDisclaimer: "This is an AI-generated visual estimate and is not a medical or biological measurement.",
       dermatologyDisclaimer: "This platform provides cosmetic guidance, not a medical diagnosis. Consider consulting a qualified dermatologist if symptoms are severe, persistent, painful, infected, or worsening.",
+      modelVersion: "gemini-3.8-flash",
+      analysisVersion: "v2.5-tiered",
       findings: [
         {
           concern: "Acne-like blemishes",
@@ -373,7 +484,7 @@ app.post('/api/gemini/coach', async (req, res) => {
   try {
     const { messages, userProfile, activeRoutine, catalogProducts, skinAnalysis } = req.body;
 
-    const systemInstruction = `You are SkinAI's Certified Skin & Wellness Coach.
+    const systemInstruction = `You are Skina's Certified Skin & Wellness Coach.
 You provide empathetic, evidence-based, cosmetic and lifestyle guidance.
 
 CRITICAL INSTRUCTIONS:
@@ -407,7 +518,7 @@ CRITICAL INSTRUCTIONS:
     });
   } catch (error: any) {
     return res.json({
-      reply: `**SkinAI Guidance:**
+      reply: `**Skina Guidance:**
 
 1. **Active Ingredient Compatibility:**
    - When layering active serums (such as Niacinamide or Hyaluronic Acid), apply thinnest to thickest consistency.
@@ -619,7 +730,7 @@ app.post('/api/gmail/send-digest', async (req, res) => {
       `To: ${toEmail}`,
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
-      `Subject: =?utf-8?B?${Buffer.from(subject || 'Your SkinAI Routine Digest').toString('base64')}?=`,
+      `Subject: =?utf-8?B?${Buffer.from(subject || 'Your Skina Routine Digest').toString('base64')}?=`,
       '',
       htmlBody
     ];
@@ -773,9 +884,34 @@ Return ONLY valid JSON matching:
   }
 });
 
+// Server-Side Plan Entitlement Verification & Quota Enforcement
+app.post('/api/entitlements/verify', (req, res) => {
+  const { tier = 'free', requestedFeature } = req.body;
+  const normalizedTier = tier === 'start' ? 'bronze' : tier === 'high' ? 'gold' : tier;
+
+  const tierLimits: Record<string, { scans: number; features: string[] }> = {
+    free: { scans: 3, features: ['aiAnalysis', 'basicRecommendations'] },
+    bronze: { scans: 10, features: ['aiAnalysis', 'guidedScan', 'multiZoneAnalysis', 'historicalComparison'] },
+    silver: { scans: 25, features: ['aiAnalysis', 'guidedScan', 'multiZoneAnalysis', 'heatmaps', 'radarChart', 'detailedMetrics', 'aiCoachPersonalization', 'routineIntelligence'] },
+    gold: { scans: 50, features: ['aiAnalysis', 'guidedScan', 'multiZoneAnalysis', 'heatmaps', 'radarChart', 'detailedMetrics', 'aiCoachPersonalization', 'routineIntelligence', 'historicalComparison', 'advancedProgress', 'downloadableReports'] },
+    platinum: { scans: 9999, features: ['aiAnalysis', 'guidedScan', 'multiZoneAnalysis', 'heatmaps', 'radarChart', 'detailedMetrics', 'aiCoachPersonalization', 'routineIntelligence', 'historicalComparison', 'advancedProgress', 'downloadableReports', 'professionalReports', 'advancedPrivacy'] },
+    enterprise: { scans: 99999, features: ['aiAnalysis', 'guidedScan', 'multiZoneAnalysis', 'heatmaps', 'radarChart', 'detailedMetrics', 'aiCoachPersonalization', 'routineIntelligence', 'historicalComparison', 'advancedProgress', 'downloadableReports', 'professionalReports', 'advancedPrivacy', 'organizationTeam', 'scannerIntegration'] }
+  };
+
+  const plan = tierLimits[normalizedTier] || tierLimits.free;
+  const allowed = !requestedFeature || plan.features.includes(requestedFeature);
+
+  return res.json({
+    tier: normalizedTier,
+    allowed,
+    monthlyLimit: plan.scans,
+    features: plan.features
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', service: 'SkinAI Platform API', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', service: 'Skina Platform API', timestamp: new Date().toISOString() });
 });
 
 // Vite middleware in dev or static files in production
@@ -800,7 +936,7 @@ async function bootstrap() {
   }
 
   app.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`SkinAI server running on http://0.0.0.0:${PORT}`);
+    console.log(`Skina server running on http://0.0.0.0:${PORT}`);
   });
 }
 

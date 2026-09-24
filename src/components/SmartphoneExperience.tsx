@@ -134,14 +134,14 @@ export const SmartphoneExperience: React.FC<SmartphoneExperienceProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
               </div>
 
-              {/* Top Navigation: Skino logo + Skip */}
+              {/* Top Navigation: Skina logo + Skip */}
               <div className="relative z-10 px-5 pt-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-stone-950 text-white flex items-center justify-center shadow-md">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <span className="font-extrabold text-stone-950 tracking-tight text-base font-serif-display drop-shadow-xs">
-                    Skino
+                    Skina
                   </span>
                 </div>
 

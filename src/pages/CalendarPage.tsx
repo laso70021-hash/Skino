@@ -53,18 +53,18 @@ export const CalendarPage: React.FC = () => {
     const startStr = `${evt.date.replace(/-/g, '')}T${evt.time.replace(':', '')}00`;
     const endHour = (parseInt(evt.time.split(':')[0]) + 1).toString().padStart(2, '0');
     const endStr = `${evt.date.replace(/-/g, '')}T${endHour}${evt.time.split(':')[1]}00`;
-    const details = encodeURIComponent(evt.notes || 'SkinAI Skincare & Wellness checkpoint');
-    const title = encodeURIComponent(`SkinAI: ${evt.title}`);
+    const details = encodeURIComponent(evt.notes || 'Skina Skincare & Wellness checkpoint');
+    const title = encodeURIComponent(`Skina: ${evt.title}`);
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}`;
   };
 
   const downloadICS = () => {
-    let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SkinAI//Skincare OS//EN\n";
+    let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Skina//Skincare OS//EN\n";
     calendarEvents.forEach((evt) => {
       const dtStart = `${evt.date.replace(/-/g, '')}T${evt.time.replace(':', '')}00`;
       const endHour = (parseInt(evt.time.split(':')[0]) + 1).toString().padStart(2, '0');
       const dtEnd = `${evt.date.replace(/-/g, '')}T${endHour}${evt.time.split(':')[1]}00`;
-      icsContent += `BEGIN:VEVENT\nSUMMARY:SkinAI: ${evt.title}\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nDESCRIPTION:${evt.notes || 'Skincare checkpoint'}\nSTATUS:CONFIRMED\nEND:VEVENT\n`;
+      icsContent += `BEGIN:VEVENT\nSUMMARY:Skina: ${evt.title}\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nDESCRIPTION:${evt.notes || 'Skincare checkpoint'}\nSTATUS:CONFIRMED\nEND:VEVENT\n`;
     });
     icsContent += "END:VCALENDAR";
 

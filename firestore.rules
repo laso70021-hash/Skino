@@ -46,6 +46,12 @@ service cloud.firestore {
       allow create, update, delete: if isSignedIn() && isValidId(productId);
     }
 
+    // Subscription & Intelligence Plans
+    match /plans/{planId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidId(planId);
+    }
+
     // User profiles & user-scoped subcollections
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();

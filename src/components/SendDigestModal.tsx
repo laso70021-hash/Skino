@@ -11,7 +11,7 @@ export const SendDigestModal: React.FC<SendDigestModalProps> = ({ isOpen, onClos
   const { user, userProfile, morningRoutine, eveningRoutine, latestAnalysis, gmailToken } = useApp();
 
   const [toEmail, setToEmail] = useState(userProfile?.email || user?.email || 'postkwanza@gmail.com');
-  const [subject, setSubject] = useState('Your SkinAI Skincare Schedule & Wait Intervals');
+  const [subject, setSubject] = useState('Your Skina Skincare Schedule & Wait Intervals');
   const [isSending, setIsSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export const SendDigestModal: React.FC<SendDigestModalProps> = ({ isOpen, onClos
   const generateEmailHtml = () => {
     return `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #292524; background-color: #fafaf9; border-radius: 12px;">
-        <h1 style="color: #0f766e; margin-bottom: 4px;">SkinAI Skincare & Wellness Operating System</h1>
+        <h1 style="color: #0f766e; margin-bottom: 4px;">Skina Skincare & Wellness Operating System</h1>
         <p style="color: #78716c; font-size: 14px; margin-top: 0;">Personalized Routine & Contact Intervals for ${userProfile?.displayName || 'Amina'}</p>
         
         <div style="background-color: #ffffff; padding: 16px; border-radius: 8px; margin: 16px 0; border: 1px solid #e7e5e4;">
@@ -50,7 +50,7 @@ export const SendDigestModal: React.FC<SendDigestModalProps> = ({ isOpen, onClos
         </div>
 
         <p style="font-size: 12px; color: #a8a29e; text-align: center; margin-top: 24px;">
-          Cosmetic guidance provided by SkinAI. Not a medical diagnosis.
+          Cosmetic guidance provided by Skina. Not a medical diagnosis.
         </p>
       </div>
     `;
@@ -141,7 +141,7 @@ export const SendDigestModal: React.FC<SendDigestModalProps> = ({ isOpen, onClos
               <div>
                 <span className="font-bold">Confirmation Required: </span>
                 <span>
-                  Please confirm that you want SkinAI to send an email using your Gmail account with the details below.
+                  Please confirm that you want Skina to send an email using your Gmail account with the details below.
                 </span>
               </div>
             </div>

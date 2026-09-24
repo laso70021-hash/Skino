@@ -264,7 +264,7 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <p className="text-xs text-stone-600 leading-relaxed">
-              Are you sure you want to sign out of your SkinAI account on this device?
+              Are you sure you want to sign out of your Skina account on this device?
             </p>
 
             <div className="pt-2 flex items-center justify-end gap-2">

@@ -46,7 +46,12 @@ export const HomePage: React.FC<HomePageProps> = ({ initialView = 'landing' }) =
     formatPrice
   } = useApp();
 
-  const [viewMode] = useState<'landing' | 'phone' | 'dashboard'>(initialView);
+  const [viewMode, setViewMode] = useState<'landing' | 'phone' | 'dashboard'>(initialView);
+
+  // Synchronize viewMode whenever initialView changes
+  React.useEffect(() => {
+    setViewMode(initialView);
+  }, [initialView]);
   const [isDigestOpen, setIsDigestOpen] = useState(false);
 
   const todayStr = new Date().toISOString().split('T')[0];

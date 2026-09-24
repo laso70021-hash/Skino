@@ -379,7 +379,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             onClick={async () => {
               const granted = await requestPushNotifications();
               if (granted) {
-                sendLocalNotification('SkinAI Reminders Active', 'You will receive reminders for morning and evening routines.');
+                sendLocalNotification('Skina Reminders Active', 'You will receive reminders for morning and evening routines.');
               }
             }}
             className="px-3.5 py-1.5 rounded-lg bg-stone-900 text-white font-bold hover:bg-stone-800 transition shrink-0"
