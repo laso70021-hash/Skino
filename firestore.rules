@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'postkwanza@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Connectivity test document
+    match /test/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Products catalog: anyone can read, authenticated or admins can manage
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn() && isValidId(productId);
+    }
+
+    // User profiles & user-scoped subcollections
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isOwner(userId) || isAdmin();
+      allow create, update: if (isOwner(userId) || isAdmin()) && isValidId(userId);
+      allow delete: if isOwner(userId) || isAdmin();
+
+      match /userProducts/{productId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if (isOwner(userId) || isAdmin()) && isValidId(productId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /analyses/{analysisId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if (isOwner(userId) || isAdmin()) && isValidId(analysisId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /routines/{routineId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if (isOwner(userId) || isAdmin()) && isValidId(routineId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /wellnessPlans/{planId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if (isOwner(userId) || isAdmin()) && isValidId(planId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /calendarEvents/{eventId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if (isOwner(userId) || isAdmin()) && isValidId(eventId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+  }
+}

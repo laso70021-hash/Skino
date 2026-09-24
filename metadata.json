@@ -1,0 +1,10 @@
+{
+  "name": "Skino - AI Skin \u0026 Wellness Platform",
+  "description": "Understand your skin with computer vision analysis, personalized morning/evening routines with exact intervals, AI wellness plans, progress tracking, and Gmail routine digests.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

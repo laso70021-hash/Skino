@@ -1,0 +1,169 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with skin attributes, lifestyle preferences, and privacy controls",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User ID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "Display name" },
+        "ageRange": { "type": "string", "description": "Age range of user" },
+        "gender": { "type": "string", "description": "Optional gender" },
+        "country": { "type": "string", "description": "Country of residence" },
+        "skinType": { "type": "string", "description": "Dry, Oily, Combination, Normal, Sensitive" },
+        "skinConcerns": { "type": "array", "description": "List of active skin concerns" },
+        "allergies": { "type": "string", "description": "Known allergies and sensitivities" },
+        "lifestyle": { "type": "string", "description": "Sleep, exercise, sun exposure, and stress levels" },
+        "dietPreferences": { "type": "string", "description": "Dietary habits and preferences" },
+        "dailySchedule": { "type": "string", "description": "User daily routine times (wake, work, gym, sleep)" },
+        "subscriptionTier": { "type": "string", "enum": ["free", "start", "high"], "description": "Active subscription tier" },
+        "allowPhotoStorage": { "type": "boolean", "description": "Whether user allows saving facial photos" },
+        "notificationSettings": { "type": "object", "description": "Push and email notification preferences" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["uid", "email"]
+    },
+    "CatalogProduct": {
+      "title": "CatalogProduct",
+      "description": "Approved product in the platform database with detailed ingredient and compatibility data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Product ID" },
+        "name": { "type": "string", "description": "Product name" },
+        "brand": { "type": "string", "description": "Brand name" },
+        "category": { "type": "string", "description": "Cleanser, Toner, Serum, Treatment, Moisturizer, Sunscreen, Mask" },
+        "description": { "type": "string", "description": "Product description" },
+        "imageUrl": { "type": "string", "description": "Product image URL" },
+        "price": { "type": "number", "description": "Price in local currency" },
+        "currency": { "type": "string", "description": "Currency code" },
+        "stock": { "type": "number", "description": "Available stock quantity" },
+        "sku": { "type": "string", "description": "SKU identifier" },
+        "skinTypes": { "type": "array", "description": "Compatible skin types" },
+        "concerns": { "type": "array", "description": "Target concerns" },
+        "ingredients": { "type": "array", "description": "Full ingredient list" },
+        "activeIngredients": { "type": "array", "description": "Key active ingredients" },
+        "usageInstructions": { "type": "string", "description": "How to apply" },
+        "applicationArea": { "type": "string", "description": "Face, neck, eye area" },
+        "frequency": { "type": "string", "enum": ["morning", "evening", "both"], "description": "Timing frequency" },
+        "waitIntervalSeconds": { "type": "number", "description": "Recommended wait time before next step" },
+        "potentialIrritants": { "type": "array", "description": "Sensitivities or irritants" },
+        "avoidCombiningWith": { "type": "array", "description": "Contradictory actives or ingredients" },
+        "compatibleWith": { "type": "array", "description": "Complementary ingredients" },
+        "contraindications": { "type": "string", "description": "Safety warnings and contraindications" },
+        "isActive": { "type": "boolean", "description": "Whether product is active for recommendation" }
+      },
+      "required": ["name", "brand", "category", "isActive"]
+    },
+    "UserProduct": {
+      "title": "UserProduct",
+      "description": "Products owned by user entered manually or scanned via photo/barcode",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "User product ID" },
+        "userId": { "type": "string", "description": "User ID" },
+        "name": { "type": "string", "description": "Product name" },
+        "brand": { "type": "string", "description": "Brand name" },
+        "category": { "type": "string", "description": "Product category" },
+        "ingredients": { "type": "array", "description": "Ingredients parsed or entered" },
+        "activeIngredients": { "type": "array", "description": "Extracted active ingredients" },
+        "usageInstructions": { "type": "string", "description": "How user uses this" },
+        "frequency": { "type": "string", "description": "Morning, evening, or as needed" },
+        "addedAt": { "type": "string", "description": "Timestamp added" }
+      },
+      "required": ["userId", "name"]
+    },
+    "SkinAnalysis": {
+      "title": "SkinAnalysis",
+      "description": "AI skin analysis record based on facial scan feature extraction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Scan analysis ID" },
+        "userId": { "type": "string", "description": "User ID" },
+        "imageUrl": { "type": "string", "description": "Facial photo URL if user enabled storage" },
+        "angles": { "type": "array", "description": "Scanned angles (front, left, right)" },
+        "skinHealthScore": { "type": "number", "description": "Overall score 0-100" },
+        "metrics": { "type": "object", "description": "Detailed scores for blemishes, hydration, oil balance, texture, pigmentation, redness" },
+        "findings": { "type": "array", "description": "Structured findings with severity and confidence" },
+        "estimatedAppearanceAge": { "type": "number", "description": "AI-estimated appearance metric" },
+        "dermatologyDisclaimer": { "type": "string", "description": "Non-medical disclaimer text" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["userId", "skinHealthScore", "createdAt"]
+    },
+    "UserRoutine": {
+      "title": "UserRoutine",
+      "description": "Morning or evening personalized routine with step order and intervals",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Routine ID" },
+        "userId": { "type": "string", "description": "User ID" },
+        "type": { "type": "string", "enum": ["morning", "evening"], "description": "Time of day" },
+        "targetTime": { "type": "string", "description": "Target start time e.g. 07:00" },
+        "steps": { "type": "array", "description": "Ordered steps with duration, wait intervals, and product info" },
+        "safetyNotes": { "type": "array", "description": "Contraindication and compatibility explanations" },
+        "updatedAt": { "type": "string", "description": "Last updated timestamp" }
+      },
+      "required": ["userId", "type", "steps"]
+    },
+    "WellnessPlan": {
+      "title": "WellnessPlan",
+      "description": "Personalized daily nutrition, hydration, and lifestyle schedule",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Wellness plan ID" },
+        "userId": { "type": "string", "description": "User ID" },
+        "schedule": { "type": "array", "description": "Timed daily nutrition and hydration items" },
+        "waterTargetMl": { "type": "number", "description": "Target water intake in ml" },
+        "nutritionHighlights": { "type": "array", "description": "Nutrient-rich guidance using local/accessible foods" },
+        "updatedAt": { "type": "string", "description": "Last updated timestamp" }
+      },
+      "required": ["userId", "schedule"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "Calendar events for routines, meals, hydration, and scan milestones",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Event ID" },
+        "userId": { "type": "string", "description": "User ID" },
+        "title": { "type": "string", "description": "Event title" },
+        "type": { "type": "string", "description": "morning_routine, evening_routine, meal, hydration, skin_scan, progress_review" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "time": { "type": "string", "description": "HH:MM" },
+        "completed": { "type": "boolean", "description": "Completion status" }
+      },
+      "required": ["userId", "title", "date", "time"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile and personal settings"
+    },
+    "/products/{productId}": {
+      "schema": "CatalogProduct",
+      "description": "Platform approved product catalog managed by admins"
+    },
+    "/users/{userId}/userProducts/{productId}": {
+      "schema": "UserProduct",
+      "description": "User personal shelf of existing skincare products"
+    },
+    "/users/{userId}/analyses/{analysisId}": {
+      "schema": "SkinAnalysis",
+      "description": "User skin scan analyses over time"
+    },
+    "/users/{userId}/routines/{routineId}": {
+      "schema": "UserRoutine",
+      "description": "User morning and evening routines"
+    },
+    "/users/{userId}/wellnessPlans/{planId}": {
+      "schema": "WellnessPlan",
+      "description": "User nutrition and wellness schedule"
+    },
+    "/users/{userId}/calendarEvents/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "User scheduled events and routine logs"
+    }
+  }
+}
